@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:band_names/models/band.dart';
 import 'package:band_names/providers/bands.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -31,11 +36,7 @@ class HomeScreen extends ConsumerWidget {
           return _BandTile(band: band);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 1,
-        child: const Icon(Icons.add),
-        onPressed: () {},
-      ),
+      floatingActionButton: const _AddBandButton(),
     );
   }
 }
@@ -66,5 +67,94 @@ class _BandTile extends StatelessWidget {
       ),
       onTap: () {},
     );
+  }
+}
+
+class _AddBandButton extends HookConsumerWidget {
+  const _AddBandButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textController = useTextEditingController();
+
+    return FloatingActionButton(
+      elevation: 1,
+      child: const Icon(Icons.add),
+      onPressed: () {
+        (Platform.isAndroid)
+            ? showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('New band name:'),
+                    content: TextField(
+                      controller: textController,
+                    ),
+                    actions: [
+                      TextButton(
+                        child: const Text('Add'),
+                        onPressed: () {
+                          addBandToList(
+                            context,
+                            ref,
+                            textController.text,
+                          );
+                        },
+                      )
+                    ],
+                  );
+                },
+              )
+            : showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text('New band name:'),
+                    content: CupertinoTextField(
+                      controller: textController,
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        isDefaultAction: true,
+                        child: const Text('Add'),
+                        onPressed: () {
+                          addBandToList(
+                            context,
+                            ref,
+                            textController.text,
+                          );
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        isDestructiveAction: true,
+                        child: const Text('Dismiss'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+      },
+    );
+  }
+
+  void addBandToList(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+  ) {
+    if (name.length > 1) {
+      ref.watch(bandsProvider.notifier).add(
+            band: Band(
+              id: DateTime.now().toString(),
+              name: name,
+            ),
+          );
+    }
+    Navigator.of(context).pop();
   }
 }

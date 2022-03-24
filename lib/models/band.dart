@@ -8,8 +8,10 @@ class Band {
   const Band({
     required this.id,
     required this.name,
-    required this.votes,
+    this.votes = 0,
   });
+
+
 
   Map<String, dynamic> toMap() {
     return {
