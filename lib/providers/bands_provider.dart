@@ -20,6 +20,7 @@ class BandsNotifier extends StateNotifier<List<Band>> {
   }
 }
 
-final bandsProvider = StateNotifierProvider<BandsNotifier, List<Band>>((ref) {
+final bandsProvider =
+    StateNotifierProvider.autoDispose<BandsNotifier, List<Band>>((ref) {
   return BandsNotifier();
 });
