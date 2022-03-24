@@ -14,6 +14,10 @@ class BandsNotifier extends StateNotifier<List<Band>> {
   void add({required Band band}) {
     state = [...state, band];
   }
+
+  void remove({required Band targetBand}) {
+    state = state.where((band) => band != targetBand).toList();
+  }
 }
 
 final bandsProvider = StateNotifierProvider<BandsNotifier, List<Band>>((ref) {

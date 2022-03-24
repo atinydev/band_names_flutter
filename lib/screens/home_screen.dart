@@ -1,11 +1,10 @@
 import 'dart:io';
 
-import 'package:band_names/models/band.dart';
-import 'package:band_names/providers/bands.dart';
+import 'package:band_names/models/models.dart';
+import 'package:band_names/providers/providers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -41,7 +40,7 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _BandTile extends StatelessWidget {
+class _BandTile extends ConsumerWidget {
   const _BandTile({
     Key? key,
     required this.band,
@@ -50,22 +49,44 @@ class _BandTile extends StatelessWidget {
   final Band band;
 
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.blue[100],
-        child: Text(
-          band.name.substring(0, 2),
+  Widget build(BuildContext context, ref) {
+    return Dismissible(
+      key: Key(band.id),
+      direction: DismissDirection.startToEnd,
+      onDismissed: (direction) {
+        ref.watch(bandsProvider.notifier).remove(
+              targetBand: band,
+            );
+      },
+      background: Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(left: 8),
+        child: const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Delete Band',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
-      title: Text(band.name),
-      trailing: Text(
-        '${band.votes}',
-        style: const TextStyle(
-          fontSize: 20,
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.blue[100],
+          child: Text(
+            band.name.substring(0, 2),
+          ),
         ),
+        title: Text(band.name),
+        trailing: Text(
+          '${band.votes}',
+          style: const TextStyle(
+            fontSize: 20,
+          ),
+        ),
+        onTap: () {},
       ),
-      onTap: () {},
     );
   }
 }
